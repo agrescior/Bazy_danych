@@ -10,7 +10,7 @@ SELECT * FROM ksiegowosc.wynagrodzenie;
 
 --a)
 
-SELECT pracownicy.imiÍ, pracownicy.nazwisko, CONCAT_WS('','(+48)', pracownicy.telefon) AS 'telefon' FROM ksiegowosc.pracownicy;
+SELECT pracownicy.imiƒô, pracownicy.nazwisko, CONCAT_WS('','(+48)', pracownicy.telefon) AS 'telefon' FROM ksiegowosc.pracownicy;
 
 --b)
 
@@ -22,22 +22,33 @@ SET pracownicy.telefon = FORMAT(cast(pracownicy.telefon AS int), '###-###-###');
 
 --c) 
 
-SELECT TOP 1 UPPER(pracownicy.nazwisko) AS 'nazwisko', UPPER(pracownicy.imiÍ) AS 'imiÍ', UPPER(pracownicy.adres) AS 'adres'
+SELECT TOP 1 UPPER(pracownicy.nazwisko) AS 'nazwisko', UPPER(pracownicy.imiƒô) AS 'imiƒô', UPPER(pracownicy.adres) AS 'adres'
 FROM ksiegowosc.pracownicy ORDER BY LEN(pracownicy.nazwisko) DESC;
 
 --d) 
 
-SELECT HASHBYTES ('MD5',pracownicy.imiÍ) AS 'imie', HASHBYTES('MD5',pracownicy.nazwisko) AS 'nazwisko', HASHBYTES('MD5',CAST( pensje.kwota_brutto AS varchar)) AS 'pensja' 
+SELECT HASHBYTES ('MD5',pracownicy.imiƒô) AS 'imie', HASHBYTES('MD5',pracownicy.nazwisko) AS 'nazwisko', HASHBYTES('MD5',CAST( pensje.kwota_brutto AS varchar)) AS 'pensja' 
 FROM ksiegowosc.pracownicy INNER JOIN (ksiegowosc.wynagrodzenie INNER JOIN ksiegowosc.pensje ON pensje.id_pensji = wynagrodzenie.id_pensji)
 ON pracownicy.id_pracownika = wynagrodzenie.id_pracownika;
 
 --e)
 
-SELECT pracownicy.id_pracownika, pracownicy.imiÍ, pracownicy.nazwisko, pensje.kwota_brutto AS 'pensja', premie.kwota AS 'premia'
+SELECT pracownicy.id_pracownika, pracownicy.imiƒô, pracownicy.nazwisko, pensje.kwota_brutto AS 'pensja', premie.kwota AS 'premia'
 FROM ksiegowosc.pracownicy LEFT JOIN (ksiegowosc.pensje LEFT JOIN ( ksiegowosc.wynagrodzenie LEFT JOIN ksiegowosc.premie  ON wynagrodzenie.id_premii = premie.id_premii) ON pensje.id_pensji = wynagrodzenie.id_pensji ) ON pracownicy.id_pracownika = wynagrodzenie.id_pracownika
 
 --f)
 
-SELECT CONCAT('Pracownik ', pracownicy.imiÍ,' ', pracownicy.nazwisko,', w dniu ', godziny.dzieÒ, ' otrzyma≥ pensjÍ ca≥kowitπ na kwotÍ ', (pensje.kwota_brutto + premie.kwota) ,', gdzie wynagrodzenie zasadnicze wynosi≥o: ', pensje.kwota_brutto, ' z≥, premia: ', premie.kwota, ' z≥') AS 'raport'
-FROM ksiegowosc.pracownicy INNER JOIN (ksiegowosc.pensje INNER JOIN ( ksiegowosc.premie INNER JOIN (ksiegowosc.godziny INNER JOIN ksiegowosc.wynagrodzenie ON godziny.id_godziny = wynagrodzenie.id_godziny) ON premie.id_premii = wynagrodzenie.id_premii) ON pensje.id_pensji = wynagrodzenie.id_pensji ) ON pracownicy.id_pracownika = wynagrodzenie.id_pracownika
-
+--SELECT CONCAT('Pracownik ', pracownicy.imiƒô,' ', pracownicy.nazwisko,', w dniu ', godziny.dzie≈Ñ, ' otrzyma≈Ç pensjƒô ca≈Çkowit≈° na kwotƒô ', (pensje.kwota_brutto + premie.kwota) ,', gdzie wynagrodzenie zasadnicze wynosi≈Ço: ', pensje.kwota_brutto, ' z≈Ç, premia: ', premie.kwota, ' z≈Ç') AS 'raport'
+--FROM ksiegowosc.pracownicy INNER JOIN (ksiegowosc.pensje INNER JOIN ( ksiegowosc.premie INNER JOIN (ksiegowosc.godziny INNER JOIN ksiegowosc.wynagrodzenie ON godziny.id_godziny = wynagrodzenie.id_godziny) ON premie.id_premii = wynagrodzenie.id_premii) ON pensje.id_pensji = wynagrodzenie.id_pensji ) ON pracownicy.id_pracownika = wynagrodzenie.id_pracownika
+SELECT CONCAT('Pracownik ', pracownicy.imiƒô,' ', pracownicy.nazwisko,', w dniu ',
+godziny.dzie≈Ñ, ' otrzyma≈Ç pensjƒô ca≈ÇkowitƒÖ na kwotƒô ', (pensje.kwota_brutto + premie.kwota + (CASE WHEN (godziny.liczba_godzin)>160 THEN ((godziny.liczba_godzin)-160)*10 ELSE 0 END)) ,', gdzie wynagrodzenie zasadnicze wynosi≈Ço: ',
+pensje.kwota_brutto, ' z≈Ç, premia: ', premie.kwota, ' z≈Ç, nadgodziny:', CASE WHEN (godziny.liczba_godzin)>160 THEN ((godziny.liczba_godzin)-160)*10 ELSE 0 END, ' z≈Ç.') AS 'raport'
+FROM ksiegowosc.pracownicy 
+INNER JOIN (ksiegowosc.pensje 
+INNER JOIN (ksiegowosc.premie 
+INNER JOIN (ksiegowosc.godziny 
+INNER JOIN ksiegowosc.wynagrodzenie 
+ON godziny.id_godziny = wynagrodzenie.id_godziny) 
+ON premie.id_premii = wynagrodzenie.id_premii) 
+ON pensje.id_pensji = wynagrodzenie.id_pensji ) 
+ON pracownicy.id_pracownika = wynagrodzenie.id_pracownika;
