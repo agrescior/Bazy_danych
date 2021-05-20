@@ -2,13 +2,13 @@
 
 USE AdventureWorks2019;
 
--- 1. Przygotuj blok anonimowy, który:
--- - znajdzie œredni¹ stawkê wynagrodzenia pracowników,
--- - wyœwietli szczegó³y pracowników, których stawka wynagrodzenia jest ni¿sza ni¿ œrednia.
+-- 1. Przygotuj blok anonimowy, ktÃ³ry:
+-- - znajdzie Å“redniÂ¹ stawkÃª wynagrodzenia pracownikÃ³w,
+-- - wyÅ“wietli szczegÃ³Â³y pracownikÃ³w, ktÃ³rych stawka wynagrodzenia jest niÂ¿sza niÂ¿ Å“rednia.
 
 BEGIN
 
-SELECT AVG([Rate]) AS 'Œrednia'
+SELECT AVG([Rate]) AS 'Å’rednia'
   FROM [AdventureWorks2019].[HumanResources].[EmployeePayHistory]
 
 SELECT [HumanResources].[EmployeePayHistory].[BusinessEntityID],[PersonType]
@@ -22,7 +22,7 @@ SELECT [HumanResources].[EmployeePayHistory].[BusinessEntityID],[PersonType]
 END;
 
 
--- 2. Utwórz funkcjê, która zwróci datê wysy³ki okreœlonego zamówienia.
+-- 2. UtwÃ³rz funkcjÃª, ktÃ³ra zwrÃ³ci datÃª wysyÂ³ki okreÅ“lonego zamÃ³wienia.
 
 CREATE OR ALTER FUNCTION OrderDate(@OrderID INT)
 	RETURNS VARCHAR(30)
@@ -44,11 +44,11 @@ CREATE OR ALTER FUNCTION OrderDate(@OrderID INT)
 	RETURN @result
 END;
 
-	SELECT dbo.OrderDate(43659) AS 'Data zamówienia'
-	SELECT dbo.OrderDate(436591) AS 'Data zamówienia'
+	SELECT dbo.OrderDate(43659) AS 'Data zamÃ³wienia'
+	SELECT dbo.OrderDate(436591) AS 'Data zamÃ³wienia'
 
--- 3. Utwórz procedurê sk³adowan¹, która jako parametr przyjmujê nazwê produktu, a jako
---rezultat wyœwietla jego identyfikator, numer i dostêpnoœæ.
+-- 3. UtwÃ³rz procedurÃª skÂ³adowanÂ¹, ktÃ³ra jako parametr przyjmujÃª nazwÃª produktu, a jako
+--rezultat wyÅ“wietla jego identyfikator, numer i dostÃªpnoÅ“Ã¦.
 
 CREATE OR ALTER PROCEDURE FindProduct(@name AS NVARCHAR(50))
 	AS
@@ -68,7 +68,7 @@ END;
 	EXEC FindProduct 'Blade';
 	EXEC FindProduct 'Bladezzzz';
 
--- 4. Utwórz funkcjê, która zwraca numer karty kredytowej dla konkretnego zamówienia
+-- 4. UtwÃ³rz funkcjÃª, ktÃ³ra zwraca numer karty kredytowej dla konkretnego zamÃ³wienia
 
 CREATE OR ALTER FUNCTION CreditCardNum(@OrderID INT)
 	RETURNS NVARCHAR(25)
@@ -95,7 +95,112 @@ END;
 	SELECT dbo.CreditCardNum(436811) AS 'Numer karty kredytowej'
 
 
--- 5. Utwórz procedurê sk³adowan¹, która jako parametry wejœciowe przyjmuje dwie liczby, num1
--- i num2, a zwraca wynik ich dzielenia. Ponadto wartoœæ num1 powinna zawsze byæ wiêksza ni¿
--- wartoœæ num2. Je¿eli wartoœæ num1 jest mniejsza ni¿ num2, wygeneruj komunikat o b³êdzie
--- „Niew³aœciwie zdefiniowa³eœ dane wejœciowe”.CREATE OR ALTER PROCEDURE Dzielenie(	@num1 AS FLOAT,	@num2 AS FLOAT	)	AS 	BEGIN	DECLARE @result FLOAT	IF(@num1 < @num2 OR @num2 = 0)		BEGIN		PRINT 'Niew³aœciwie zdefiniowa³eœ dane wejœciowe';		END	ELSE 		BEGIN		SET @result = @num1/@num2;		PRINT @result		ENDEND;	EXEC Dzielenie 12,3;	EXEC Dzielenie 17,4;	EXEC Dzielenie 1,9;
+
+-- 5. UtwÃ³rz procedurÄ™ skÅ‚adowanÄ…, ktÃ³ra jako parametry wejÅ›ciowe przyjmuje dwie liczby, num1
+-- i num2, a zwraca wynik ich dzielenia. Ponadto wartoÅ›Ä‡ num1 powinna zawsze byÄ‡ wiÄ™ksza niÅ¼
+-- wartoÅ›Ä‡ num2. JeÅ¼eli wartoÅ›Ä‡ num1 jest mniejsza niÅ¼ num2, wygeneruj komunikat o bÅ‚Ä™dzie
+-- â€žNiewÅ‚aÅ›ciwie zdefiniowaÅ‚eÅ› dane wejÅ›cioweâ€.
+
+CREATE OR ALTER PROCEDURE Dzielenie(
+	@num1 AS FLOAT,
+	@num2 AS FLOAT
+	)
+	AS 
+	BEGIN
+	DECLARE @result FLOAT
+	IF(@num1 < @num2 OR @num2 = 0)
+		BEGIN
+		PRINT 'Niewlasciwie zdefiniowales dane wejsciowe'
+		END
+	ELSE 
+		BEGIN
+		SET @result = @num1/@num2
+		PRINT @result
+		END
+END;
+
+	EXEC Dzielenie 12,3
+	EXEC Dzielenie 17,4
+	EXEC Dzielenie 1,9
+
+
+-- 6. Napisz procedurÄ™, ktÃ³ra jako parametr przyjmie NationalIDNumber danej osoby, a zwrÃ³ci
+-- stanowisko oraz liczbÄ™ dni urlopowych i chorobowych.
+
+CREATE OR ALTER PROCEDURE JobTitle(@ID AS NVARCHAR(15))
+	AS
+	BEGIN
+	IF EXISTS (SELECT [NationalIDNumber] FROM [AdventureWorks2019].[HumanResources].[Employee] WHERE [NationalIDNumber] = @ID)
+		BEGIN
+			SELECT [JobTitle],[VacationHours],[SickLeaveHours]
+			FROM [AdventureWorks2019].[HumanResources].[Employee]
+			WHERE [NationalIDNumber] = @ID;
+		END
+	ELSE
+		BEGIN
+			PRINT 'Niepoprawne NationalIDNumber!'
+		END
+END;
+
+EXEC JobTitle 295847284;
+EXEC JobTitle 2958472841;
+
+
+-- 7. Napisz procedurÄ™ bÄ™dÄ…cÄ… kalkulatorem walutowym. Wykorzystaj dwie tabele: Sales.Currency
+--  oraz Sales.CurrencyRate. Parametrami wejÅ›ciowymi majÄ… byÄ‡: kwota, waluty oraz data
+--  (CurrencyRateDate). Przyjmij, iÅ¼ zawsze jednÄ… ze stron jest dolar amerykaÅ„ski (USD).
+--  Zaimplementuj kalkulacjÄ™ obustronnÄ…, tj: 1400 USD â†’ PLN lub PLN â†’ USD
+
+CREATE OR ALTER PROCEDURE KalkulatorWalutowy(
+	@kwota MONEY, 
+	@walutaIN NCHAR(3),
+	@walutaOUT NCHAR(3),
+	@data DATETIME
+	)
+	AS 
+	BEGIN
+	DECLARE @result MONEY
+		IF EXISTS (SELECT [CurrencyCode] FROM [AdventureWorks2019].[Sales].[Currency] WHERE [CurrencyCode] = @walutaIN)
+		AND EXISTS ( SELECT [CurrencyCode] FROM [AdventureWorks2019].[Sales].[Currency] WHERE [CurrencyCode] = @walutaOUT)
+			BEGIN
+				IF(@walutaIN = 'USD')
+					BEGIN
+						IF EXISTS(SELECT [AverageRate] FROM [AdventureWorks2019].[Sales].[CurrencyRate] 
+						WHERE [CurrencyRateDate] = @data AND [ToCurrencyCode] = @walutaOUT)
+							BEGIN
+								SET @result = @kwota*(SELECT [AverageRate] FROM [AdventureWorks2019].[Sales].[CurrencyRate] 
+								WHERE [CurrencyRateDate] = @data AND [ToCurrencyCode] = @walutaOUT)
+								PRINT(@walutaIN + ' -> ' + @walutaOUT)
+								PRINT(@result)
+							END
+						ELSE
+							BEGIN
+								PRINT 'Niepoprawna data'
+							END
+					END
+				ELSE
+					BEGIN
+						IF EXISTS(SELECT [AverageRate] FROM [AdventureWorks2019].[Sales].[CurrencyRate] 
+						WHERE [CurrencyRateDate] = @data AND [ToCurrencyCode] = @walutaOUT)
+							BEGIN
+								SET @result = @kwota/(SELECT [AverageRate] FROM [AdventureWorks2019].[Sales].[CurrencyRate] 
+								WHERE [CurrencyRateDate] = @data AND [ToCurrencyCode] = @walutaIN)
+								PRINT(@walutaIN + ' -> ' + @walutaOUT ) 
+								PRINT(@result)
+							END
+						ELSE
+							BEGIN
+								PRINT 'Niepoprawna data'
+							END
+					END
+			END
+		ELSE
+			BEGIN
+				PRINT 'Niepoprawny kod waluty'
+			END
+	END;
+
+	EXEC KalkulatorWalutowy 100, 'USD', 'EUR', '2011-05-31 00:00:00.000'
+	EXEC KalkulatorWalutowy 100, 'GBP', 'USD', '2011-06-06 00:00:00.000' 
+	EXEC KalkulatorWalutowy 100, 'USD', 'FRF', '2011-05-30 00:00:00.000' 
+
